@@ -20,9 +20,9 @@ use Psr\Http\Message\ResponseInterface;
  * @\App\Controller\Admin\IndexController
  */
 #[Controller(prefix: '/admin/index')]
-final readonly class IndexController extends AbstractHttpController
+final class IndexController extends AbstractHttpController
 {
-	public function __construct(private AdministratorService $serviceAdminAdministrator)
+	public function __construct(private readonly AdministratorService $serviceAdminAdministrator)
 	{
 	}
 
@@ -43,10 +43,13 @@ final readonly class IndexController extends AbstractHttpController
 	{
 		$inputs = $loginValidator->validated();
 
-		[$token, $userinfo] = $this->serviceAdminAdministrator->login(... $inputs);
+		[
+			$token,
+			$userinfo,
+		] = $this->serviceAdminAdministrator->login(... $inputs);
 
 		return $this->response->success(
-			data   : $userinfo,
+			data:    $userinfo,
 			headers: [
 				         'Authorization' => $token,
 			         ],

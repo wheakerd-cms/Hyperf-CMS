@@ -45,15 +45,11 @@ final class AdministratorController extends AbstractHttpController
 		$params = $this->validatorFactory->make(
 			$this->request->all(),
 			[
-				'params'      => 'sometimes|json',
-				'perPage'     => 'sometimes|integer',
-				'currentPage' => 'sometimes|integer',
+				'params' => 'sometimes|json',
 			],
 		)->validate();
 
-		$params      = $params['params'] ?? null;
-		$perPage     = $params['perPage'] ?? null;
-		$currentPage = $params['currentPage'] ?? null;
+		$params = $params['params'] ?? null;
 
 		/* @var ModelAdminAdministrator $userinfo */
 		$userinfo = Context::get('userinfo');
@@ -62,8 +58,6 @@ final class AdministratorController extends AbstractHttpController
 			$this->administratorService->getAdministratorBelongToRole(
 				$userinfo->roleId,
 				$params,
-				$currentPage,
-				$perPage,
 			),
 		);
 	}

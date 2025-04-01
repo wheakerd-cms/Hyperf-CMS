@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace App\Controller\Admin\Permissions;
 
 use App\Abstract\AbstractHttpController;
-use App\Dao\Admin\DaoAdminRoles;
 use App\Middleware\Authentication\MiddlewareAdminAuthentication;
 use App\Model\Admin\ModelAdminAdministrator;
+use App\Service\Admin\RolesService;
 use Hyperf\Context\Context;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middlewares;
@@ -25,7 +25,7 @@ use Psr\Http\Message\ResponseInterface;
 ]
 final class RolesController extends AbstractHttpController
 {
-	public function __construct(private readonly DaoAdminRoles $daoAdminRoles)
+	public function __construct(private readonly RolesService $rolesService)
 	{
 	}
 
@@ -51,7 +51,7 @@ final class RolesController extends AbstractHttpController
 		$userinfo = Context::get('userinfo');
 
 		return $this->response->success(
-			$this->daoAdminRoles->list(
+			$this->rolesService->list(
 				parentKey: 'parentId',
 				key      : $userinfo->roleId,
 				params   : $params,
@@ -79,7 +79,7 @@ final class RolesController extends AbstractHttpController
 		$params = $inputs['params'] ?? null;
 
 		return $this->response->success(
-			$this->daoAdminRoles->select(
+			$this->rolesService->select(
 				params: $params,
 				sorts : ['id' => 'asc'],
 			),
@@ -106,7 +106,7 @@ final class RolesController extends AbstractHttpController
 			],
 		)->validate();
 
-		$res = $this->daoAdminRoles->save($inputs);
+		$res = $this->rolesService->save($inputs);
 
 		return $res ? $this->response->success() : $this->response->error();
 	}
@@ -127,7 +127,7 @@ final class RolesController extends AbstractHttpController
 			],
 		)->validate();
 
-		$res = $this->daoAdminRoles->delete($inputs['ids']);
+		$res = $this->rolesService->delete($inputs['ids']);
 
 		return $res ? $this->response->success() : $this->response->error();
 	}

@@ -5,7 +5,6 @@ namespace App\Dao\Admin;
 
 use App\Abstract\AbstractDao;
 use App\Model\Admin\ModelAdminRoles;
-use App\Utils\Functions;
 
 /**
  * @DaoAdminRoles

@@ -166,17 +166,10 @@ final readonly class AdministratorService extends AbstractService
 	 *
 	 * @param int         $roleId
 	 * @param string|null $params
-	 * @param int|null    $currentPage
-	 * @param int|null    $perPage
 	 *
 	 * @return array
 	 */
-	public function getAdministratorBelongToRole(
-		int     $roleId,
-		?string $params = null,
-		?int    $currentPage = null,
-		?int    $perPage = null,
-	): array
+	public function getAdministratorBelongToRole(int $roleId, ?string $params = null): array
 	{
 		$roleSelect = $this->daoAdminRoles->newQuery->select()->get()->toArray();
 
@@ -184,12 +177,10 @@ final readonly class AdministratorService extends AbstractService
 		$roleGroup = Functions::extraColumn($roleSelect, 'id', 'parentId', 'id', $roleId);
 
 		return $this->table(
-			params     : $params,
-			currentPage: $currentPage,
-			perPage    : $perPage,
-			sorts      : ['id' => 'desc'],
-			with       : ['roles'],
-			where      : fn($query) => $query->whereIn('role_id', $roleGroup),
+			params: $params,
+			sorts : ['id' => 'desc'],
+			with  : ['roles'],
+			where : fn($query) => $query->whereIn('role_id', $roleGroup),
 		);
 	}
 }

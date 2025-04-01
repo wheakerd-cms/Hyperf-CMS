@@ -3,13 +3,19 @@ declare(strict_types=1);
 
 namespace App\Library\JsonWebToken;
 
-use Jose\Component\Core\AlgorithmManager;
-use Jose\Component\Core\AlgorithmManagerFactory;
-use Jose\Component\Encryption\Algorithm\ContentEncryption\A128CBCHS256;
-use Jose\Component\Encryption\Algorithm\KeyEncryption\A256KW;
-use Jose\Component\Encryption\Algorithm\KeyEncryption\PBES2HS512A256KW;
-use Jose\Component\Signature\Algorithm\HS256;
-use Jose\Component\Signature\Algorithm\PS256;
+use Jose\Component\Core\{
+	AlgorithmManager,
+	AlgorithmManagerFactory,
+};
+use Jose\Component\Encryption\Algorithm\{
+	ContentEncryption\A128CBCHS256,
+	KeyEncryption\A256KW,
+	KeyEncryption\PBES2HS512A256KW,
+};
+use Jose\Component\Signature\Algorithm\{
+	HS256,
+	PS256,
+};
 
 /**
  * 算法管理器工厂
