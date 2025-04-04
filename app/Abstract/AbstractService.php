@@ -128,7 +128,7 @@ abstract readonly class AbstractService
 		array     $columns = ['*'],
 	): array
 	{
-		return $this->getTable(...func_get_args() + [true]);
+		return $this->getTable(...func_get_args() + ['isPagination' => true]);
 	}
 
 	/**
@@ -139,6 +139,7 @@ abstract readonly class AbstractService
 	 * @param array         $with
 	 * @param callable|null $where
 	 * @param array         $columns
+	 * @param bool          $isPagination
 	 *
 	 * @return array
 	 */
@@ -148,6 +149,7 @@ abstract readonly class AbstractService
 		array     $with = [],
 		?callable $where = null,
 		array     $columns = ['*'],
+		bool      $isPagination = false,
 	): array
 	{
 		$search      = [];
@@ -192,7 +194,7 @@ abstract readonly class AbstractService
 
 		$total = $query->count();
 
-		if (is_integer($currentPage) && is_integer($perPage)) {
+		if ($isPagination) {
 			$query = $query->offset(($currentPage - 1) * $perPage)->limit($perPage);
 		}
 
