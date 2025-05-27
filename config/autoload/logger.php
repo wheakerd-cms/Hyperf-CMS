@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 return [
-	'default'         => [
+	'default' => [
 		'handler'   => [
 			'class'       => Monolog\Handler\RotatingFileHandler::class,
 			'constructor' => [
@@ -20,7 +20,7 @@ return [
 			],
 		],
 	],
-	'sql'             => [
+	'sql'     => [
 		'handler'   => [
 			'class'       => Monolog\Handler\RotatingFileHandler::class,
 			'constructor' => [
@@ -38,47 +38,11 @@ return [
 			],
 		],
 	],
-	'tiktok'          => [
+	'library' => [
 		'handler'   => [
 			'class'       => Monolog\Handler\RotatingFileHandler::class,
 			'constructor' => [
-				'filename' => ROOT_PATH . '/runtime/logs/tiktok/tiktok.log',
-				'level'    => Monolog\Level::Error,
-				'maxFiles' => 0,
-			],
-		],
-		'formatter' => [
-			'class'       => Monolog\Formatter\LineFormatter::class,
-			'constructor' => [
-				'format'                => null,
-				'dateFormat'            => 'Y-m-d H:i:s',
-				'allowInlineLineBreaks' => true,
-			],
-		],
-	],
-	'quick-worker'    => [
-		'handler'   => [
-			'class'       => Monolog\Handler\RotatingFileHandler::class,
-			'constructor' => [
-				'filename' => ROOT_PATH . '/runtime/logs/quick-worker/quick-worker.log',
-				'level'    => Monolog\Level::Error,
-				'maxFiles' => 0,
-			],
-		],
-		'formatter' => [
-			'class'       => Monolog\Formatter\LineFormatter::class,
-			'constructor' => [
-				'format'                => null,
-				'dateFormat'            => 'Y-m-d H:i:s',
-				'allowInlineLineBreaks' => true,
-			],
-		],
-	],
-	'magnetic-engine' => [
-		'handler'   => [
-			'class'       => Monolog\Handler\RotatingFileHandler::class,
-			'constructor' => [
-				'filename' => ROOT_PATH . '/runtime/logs/magnetic-engine/magnetic-engine.log',
+				'filename' => ROOT_PATH . '/runtime/logs/library/library.log',
 				'level'    => Monolog\Level::Error,
 				'maxFiles' => 0,
 			],

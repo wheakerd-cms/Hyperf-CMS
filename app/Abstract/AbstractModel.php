@@ -20,4 +20,6 @@ abstract class AbstractModel extends Model
     public const string CREATED_AT = 'create_time';
     public const string UPDATED_AT = 'update_time';
     public const string DELETED_AT = 'delete_time';
+
+	protected array $with = [];
 }

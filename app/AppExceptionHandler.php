@@ -6,13 +6,16 @@ namespace App;
 use App\Contract\ResponseContract;
 use App\Exception\CustomMessageException;
 use App\Exception\LibraryException;
+use Hyperf\Context\RequestContext;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\ExceptionHandler\Annotation\ExceptionHandler;
 use Hyperf\ExceptionHandler\ExceptionHandler as HyperfExceptionHandler;
+use Hyperf\HttpMessage\Exception\NotFoundHttpException;
 use Hyperf\Validation\ValidationException;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
+use function Hyperf\Support\env;
 
 /**
  * @AppExceptionHandler
@@ -30,16 +33,14 @@ final class AppExceptionHandler extends HyperfExceptionHandler
 
 	public function handle(Throwable $throwable, ResponseInterface $response): MessageInterface|ResponseInterface
 	{
-		if (!PHAR_ENABLE) {
-			$this->logger->error(
-				sprintf('%s[%s] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()),
-			);
-			$this->logger->error(
-				$throwable->getTraceAsString(),
-			);
-			$this->logger->error(
-				$throwable,
-			);
+		if ('dev' === env('APP_ENV') || !PHAR_ENABLE) {
+			$this->logger->error(sprintf('%s[%s] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
+			$this->logger->error($throwable->getTraceAsString());
+			$this->logger->error($throwable);
+		}
+
+		if ($throwable instanceof NotFoundHttpException) {
+			return $this->handleNotFound($throwable);
 		}
 
 		if ($throwable instanceof ValidationException) {
@@ -55,6 +56,19 @@ final class AppExceptionHandler extends HyperfExceptionHandler
 		}
 
 		return $this->response->server('Internal Server Error.');
+	}
+
+	public function handleNotFound(NotFoundHttpException $notFoundHttpException): MessageInterface
+	{
+		$this->logger->error(
+			sprintf("\nThe Router Not Found: %s\n",
+			        RequestContext::get()->getUri()->getPath(),
+			),
+		);
+
+		$message = $notFoundHttpException->getMessage();
+
+		return $this->response->error($message);
 	}
 
 	/**

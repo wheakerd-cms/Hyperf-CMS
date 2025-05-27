@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 
 use App\Abstract\AbstractHttpController;
 use App\Middleware\Authentication\MiddlewareAdminAuthentication;
+use App\Security\AdminSecurity;
 use App\Service\Admin\AdministratorService;
 use App\Validator\Admin\AdministratorValidator;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -30,6 +31,7 @@ final class IndexController extends AbstractHttpController
 	 * 登录
 	 *
 	 * @param AdministratorValidator $loginValidator
+	 * @param AdminSecurity          $adminSecurity
 	 *
 	 * @return ResponseInterface
 	 *
@@ -39,17 +41,16 @@ final class IndexController extends AbstractHttpController
 		RequestMapping(path: 'login', methods: ['POST']),
 		Scene(scene: 'login', argument: 'loginValidator'),
 	]
-	public function login(AdministratorValidator $loginValidator): ResponseInterface
+	public function login(AdministratorValidator $loginValidator, AdminSecurity $adminSecurity): ResponseInterface
 	{
 		$inputs = $loginValidator->validated();
 
-		[
-			$token,
-			$userinfo,
-		] = $this->serviceAdminAdministrator->login(... $inputs);
+		$userinfo = $this->serviceAdminAdministrator->login(... $inputs);
+
+		$token = $adminSecurity->create($userinfo);
 
 		return $this->response->success(
-			data:    $userinfo,
+			data   : $userinfo,
 			headers: [
 				         'Authorization' => $token,
 			         ],
@@ -77,5 +78,18 @@ final class IndexController extends AbstractHttpController
 		$this->serviceAdminAdministrator->logout($token);
 
 		return $this->response->success();
+	}
+
+	/**
+	 * @return void
+	 *
+	 * @api /test
+	 */
+	#[
+		RequestMapping(path: '/test', methods: ['GET']),
+	]
+	public function test()
+	{
+
 	}
 }

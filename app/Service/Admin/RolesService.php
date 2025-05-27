@@ -10,10 +10,11 @@ use App\Dao\Admin\DaoAdminRoles;
  * @RolesService
  * @\App\Service\Admin\RolesService
  */
-final readonly class RolesService extends AbstractService
+final class RolesService extends AbstractService
 {
-	public function __construct(DaoAdminRoles $dao)
+	public function __construct(
+		private readonly DaoAdminRoles $dao,
+	)
 	{
-		parent::__construct($dao);
 	}
 }

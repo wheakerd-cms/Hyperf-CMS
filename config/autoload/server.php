@@ -12,7 +12,7 @@ return [
 			'name'      => 'http',
 			'type'      => ServerInterface::SERVER_HTTP,
 			'host'      => '0.0.0.0',
-			'port'      => 8080,
+			'port'      => 10000,
 			'sock_type' => SWOOLE_SOCK_TCP,
 			'callbacks' => [
 				Event::ON_REQUEST => [

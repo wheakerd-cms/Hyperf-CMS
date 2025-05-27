@@ -26,7 +26,7 @@ final readonly class DaoAdminAdministrator extends AbstractDao
 	 */
 	public function getUserinfoByUsername(string $username): ?ModelAdminAdministrator
 	{
-		return $this->newQuery->where('username', $username)->first();
+		return $this->newQuery()->where('username', $username)->first();
 	}
 
 	public function getUserinfoById(int $userid): ?ModelAdminAdministrator

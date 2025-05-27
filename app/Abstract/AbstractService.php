@@ -12,12 +12,8 @@ use Hyperf\Stringable\Str;
  * @AbstractService
  * @\App\Abstract\AbstractService
  */
-abstract readonly class AbstractService
+abstract class AbstractService
 {
-	public function __construct(private AbstractDao $dao)
-	{
-	}
-
 	/**
 	 * 删除
 	 *

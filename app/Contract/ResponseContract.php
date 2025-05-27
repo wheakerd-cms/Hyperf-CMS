@@ -114,6 +114,7 @@ final class ResponseContract extends Response
 	{
 		/* @var \Hyperf\HttpMessage\Server\Response $response */
 		$response = $this->getResponse();
+
 		/* @var SwooleResponse $socket */
 		$socket = $response->getConnection()->getSocket();
 

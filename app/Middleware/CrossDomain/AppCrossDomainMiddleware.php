@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Middleware\Http;
+namespace App\Middleware\CrossDomain;
 
 use Hyperf\Context\Context;
 use Psr\Http\Message\ResponseInterface;
@@ -10,10 +10,10 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * @DomainCrossMiddleware
- * @\app\Middleware\Http\DomainCrossMiddleware
+ * @AppCrossDomainMiddleware
+ * @\App\Middleware\CrossDomain\AppCrossDomainMiddleware
  */
-final readonly class DomainCrossMiddleware implements MiddlewareInterface
+final class AppCrossDomainMiddleware implements MiddlewareInterface
 {
 	/**
 	 * @param ServerRequestInterface  $request
@@ -32,7 +32,8 @@ final readonly class DomainCrossMiddleware implements MiddlewareInterface
 				'PUT',
 				'DELETE',
 				'OPTIONS',
-			]))->withHeader('Access-Control-Allow-Credentials', 'true')
+			]))
+			->withHeader('Access-Control-Allow-Credentials', 'true')
 			->withHeader(
 				'Access-Control-Allow-Headers',
 				'DNT,Keep-Alive,User-Agent,Cache-Control,Content-Type,Authorization,X-Requested-With,Token',

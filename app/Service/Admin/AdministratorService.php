@@ -18,17 +18,16 @@ use App\Utils\Functions;
  * @AdministratorService
  * @\App\Service\Admin\AdministratorService
  */
-final readonly class AdministratorService extends AbstractService
+final class AdministratorService extends AbstractService
 {
 	public function __construct(
-		private AdministratorCache    $administratorCache,
-		private AdminSecurity         $adminSecurity,
-		private DaoAdminAdministrator $daoAdminAdministrator,
-		private DaoAdminRoles         $daoAdminRoles,
-		private DaoAdminRouter        $daoAdminRouter,
+		private readonly AdministratorCache    $administratorCache,
+		private readonly AdminSecurity         $adminSecurity,
+		private readonly DaoAdminAdministrator $daoAdminAdministrator,
+		private readonly DaoAdminRoles         $daoAdminRoles,
+		private readonly DaoAdminRouter        $daoAdminRouter,
 	)
 	{
-		parent::__construct($this->daoAdminAdministrator);
 	}
 
 	/**
@@ -40,14 +39,14 @@ final readonly class AdministratorService extends AbstractService
 	 */
 	public function getAdministratorInfoById(int $id): ?ModelAdminAdministrator
 	{
-		return $this->daoAdminAdministrator->newQuery->find($id);
+		return $this->daoAdminAdministrator->newQuery()->find($id);
 	}
 
 	/**
 	 * @param string $username
 	 * @param string $password
 	 *
-	 * @return array{0: string, 1: array}
+	 * @return array
 	 */
 	public function login(string $username, string $password): array
 	{
