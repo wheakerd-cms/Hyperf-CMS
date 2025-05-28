@@ -23,7 +23,9 @@ use Psr\Http\Message\ResponseInterface;
 #[Controller(prefix: '/admin/index')]
 final class IndexController extends AbstractHttpController
 {
-	public function __construct(private readonly AdministratorService $serviceAdminAdministrator)
+	private readonly AdministratorService $serviceAdminAdministrator;
+
+	public function __construct()
 	{
 	}
 

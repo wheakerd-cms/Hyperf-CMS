@@ -37,6 +37,6 @@ final readonly class BeforeBootApplication implements ListenerInterface
 	public function process(object $event): void
 	{
 		//  初始化应用令牌密钥
-		$this->systemDefaultCache->getAdminKey() || $this->systemDefaultCache->setAdminKey();
+//		$this->systemDefaultCache->getAdminKey() || $this->systemDefaultCache->setAdminKey();
 	}
 }

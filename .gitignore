@@ -9,4 +9,4 @@ assets/public/*
 **/*.phar
 **/*.phar.gz
 composer.lock
-.env
+.env.local

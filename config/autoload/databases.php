@@ -6,14 +6,14 @@ use function Hyperf\Support\env;
 return [
 	'default' => [
 		'driver'    => env('DB_DRIVER', 'mysql'),
-		'host'      => env('DB_HOST', 'localhost'),
-		'port'      => env('DB_PORT', 3306),
-		'database'  => env('DB_DATABASE', 'database'),
-		'username'  => env('DB_USERNAME', 'root'),
-		'password'  => env('DB_PASSWORD', 123456),
-		'charset'   => env('DB_CHARSET', 'utf8mb4'),
-		'collation' => env('DB_COLLATION', 'utf8mb4_general_ci'),
-		'prefix'    => env('DB_PREFIX', ''),
+		'host'      => (string)env('DB_HOST'),
+		'port'      => (integer)env('DB_PORT'),
+		'database'  => env('DB_DATABASE'),
+		'username'  => env('DB_USERNAME'),
+		'password'  => env('DB_PASSWORD'),
+		'charset'   => env('DB_CHARSET'),
+		'collation' => env('DB_COLLATION'),
+		'prefix'    => env('DB_PREFIX'),
 		'pool'      => [
 			'min_connections' => (integer)env('DB_MIN_CONNECTIONS', 1),
 			'max_connections' => (integer)env('DB_MAX_CONNECTIONS', 10),

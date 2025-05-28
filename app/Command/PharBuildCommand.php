@@ -33,7 +33,7 @@ final class PharBuildCommand extends BuildCommand
 		$this->input->setOption('path', BASE_PATH);
 		$this->input->setOption('phar-version', $this->getPharVersion());
 		$this->input->setOption('mount', [
-			'.env',
+			'.env.local',
 			'assets',
 		]);
 
@@ -100,7 +100,7 @@ PHP;
 
 		if (is_null($name)) {
 			throw new UnexpectedValueException(
-				'APP_NAME does not exist in your .env file, please update your .env',
+				'APP_NAME does not exist in your .env.local file, please update your .env.local',
 			);
 		}
 

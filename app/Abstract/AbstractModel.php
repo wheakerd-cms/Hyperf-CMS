@@ -1,10 +1,9 @@
-<?php /** @formatter:off */
+<?php
 declare(strict_types=1);
 
 namespace App\Abstract;
 
 use Hyperf\Database\Model\Concerns\CamelCase;
-use Hyperf\Database\Model\SoftDeletes;
 use Hyperf\DbConnection\Model\Model;
 
 /**
@@ -13,13 +12,13 @@ use Hyperf\DbConnection\Model\Model;
  */
 abstract class AbstractModel extends Model
 {
-    use CamelCase;
+	use CamelCase;
 
-    public bool $timestamps = true;
-    protected ?string $dateFormat = 'U';
-    public const string CREATED_AT = 'create_time';
-    public const string UPDATED_AT = 'update_time';
-    public const string DELETED_AT = 'delete_time';
+	public bool       $timestamps = true;
+	protected ?string $dateFormat = 'U';
+	public const string CREATED_AT = 'create_time';
+	public const string UPDATED_AT = 'update_time';
+	public const string DELETED_AT = 'delete_time';
 
 	protected array $with = [];
 }
