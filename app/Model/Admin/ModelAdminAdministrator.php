@@ -7,6 +7,8 @@ use App\Abstract\AbstractModel;
 use Carbon\Carbon;
 use Hyperf\Database\Model\Relations\BelongsToMany;
 use Hyperf\Database\Model\Relations\HasOneThrough;
+use Hyperf\ModelCache\Cacheable;
+use Hyperf\ModelCache\CacheableInterface;
 
 /**
  * @ModelAdminAdministrator
@@ -22,8 +24,10 @@ use Hyperf\Database\Model\Relations\HasOneThrough;
  * @property Carbon  $createTime 创建时间
  * @property Carbon  $updateTime 更新时间
  */
-final class ModelAdminAdministrator extends AbstractModel
+final class ModelAdminAdministrator extends AbstractModel implements CacheableInterface
 {
+	use Cacheable;
+
 	protected ?string $table = 'admin_administrator';
 
 	protected array $fillable = [

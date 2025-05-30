@@ -31,18 +31,6 @@ final class AdministratorService extends AbstractService
 	}
 
 	/**
-	 * 通过主键获取管理员数据
-	 *
-	 * @param int $id
-	 *
-	 * @return ModelAdminAdministrator|null
-	 */
-	public function getAdministratorInfoById(int $id): ?ModelAdminAdministrator
-	{
-		return $this->daoAdminAdministrator->newQuery()->find($id);
-	}
-
-	/**
 	 * @param string $username
 	 * @param string $password
 	 *

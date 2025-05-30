@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Library\JsonWebToken;
+namespace App\Abstract;
 
 use Carbon\Carbon;
 use InvalidArgumentException;
@@ -21,14 +21,12 @@ use Jose\Component\Signature\{
 };
 
 /**
- * @JsonWebSignature
- * @\App\Library\JWT\JsonWebSignature
- *
- * @see https://web-token.spomky-labs.com/
+ * @AbstractSecurity
+ * @\App\Abstract\AbstractSecurity
  */
-readonly class JWT
+abstract readonly class AbstractSecurity
 {
-	public function __construct(private AlgorithmManager $signatureAlgorithmManager, private JWK $jwk)
+	public function __construct(private AlgorithmManager $algorithmManager, private JWK $jwk)
 	{
 	}
 
@@ -42,7 +40,7 @@ readonly class JWT
 	 *
 	 * @return string
 	 */
-	public function create(mixed $payload = [], int $expirationTime = 60 * 60 * 24 * 30, ?int $nowTime = null): string
+	public function getToken(mixed $payload = [], int $expirationTime = 60 * 60 * 24 * 30, ?int $nowTime = null): string
 	{
 		$nowTime ??= Carbon::now()->getTimestamp();
 
@@ -57,9 +55,7 @@ readonly class JWT
 			],
 		);
 
-		$jwsBuilder = new JWSBuilder(
-			$this->signatureAlgorithmManager,
-		);
+		$jwsBuilder = new JWSBuilder($this->algorithmManager);
 
 		$jws = $jwsBuilder->create()
 			->withPayload($payload)
@@ -78,7 +74,7 @@ readonly class JWT
 	 *
 	 * @return bool
 	 */
-	public function check(string $token): bool
+	public function verify(string $token): bool
 	{
 		$serializerManager = new JWSSerializerManager(
 			[
@@ -93,7 +89,7 @@ readonly class JWT
 			return false;
 		}
 
-		$jwsVerifier = new JWSVerifier($this->signatureAlgorithmManager);
+		$jwsVerifier = new JWSVerifier($this->algorithmManager);
 
 		return $jwsVerifier->verifyWithKey($jws, $this->jwk, 0);
 	}
@@ -106,9 +102,9 @@ readonly class JWT
 	 *
 	 * @return false|string
 	 */
-	public function barter(string $token, int $expirationTime = 3600): false|string
+	final public function barter(string $token, int $expirationTime = 3600): false|string
 	{
-		return $this->create(
+		return $this->getToken(
 			payload       : (array)$this->getPayload($token),
 			expirationTime: $expirationTime,
 		);
@@ -123,7 +119,7 @@ readonly class JWT
 	 *
 	 * }
 	 */
-	public function getPayload(string $token): object
+	final public function getPayload(string $token): object
 	{
 		$serializerManager = new JWSSerializerManager(
 			[
@@ -131,9 +127,7 @@ readonly class JWT
 			],
 		);
 
-		$jwsVerifier = new JWSVerifier(
-			$this->signatureAlgorithmManager,
-		);
+		$jwsVerifier = new JWSVerifier($this->algorithmManager);
 
 		$headerCheckerManager = new HeaderCheckerManager(
 			[

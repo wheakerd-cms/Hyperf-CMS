@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Middleware\Authentication;
 
 use App\Contract\ResponseContract;
+use App\Security\AdminSecurity;
 use App\Service\Admin\AdministratorService;
 use Hyperf\Context\Context;
 use Psr\Http\Message\ResponseInterface;
@@ -17,7 +18,11 @@ use Psr\Http\Server\RequestHandlerInterface;
  */
 final readonly class MiddlewareAdminAuthentication implements MiddlewareInterface
 {
-	public function __construct(private ResponseContract $response, private AdministratorService $administratorService)
+	public function __construct(
+		private ResponseContract     $response,
+		private AdministratorService $administratorService,
+		private AdminSecurity        $adminSecurity,
+	)
 	{
 	}
 

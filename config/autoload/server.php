@@ -6,13 +6,13 @@ use Hyperf\Server\ServerInterface;
 use Swoole\Constant;
 
 return [
-	'mode'      => SWOOLE_PROCESS,
+	'type'      => Hyperf\Server\CoroutineServer::class,
 	'servers'   => [
 		[
 			'name'      => 'http',
 			'type'      => ServerInterface::SERVER_HTTP,
 			'host'      => '0.0.0.0',
-			'port'      => 10000,
+			'port'      => 9500,
 			'sock_type' => SWOOLE_SOCK_TCP,
 			'callbacks' => [
 				Event::ON_REQUEST => [

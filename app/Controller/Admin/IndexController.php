@@ -11,7 +11,6 @@ use App\Validator\Admin\AdministratorValidator;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middlewares;
 use Hyperf\HttpServer\Annotation\RequestMapping;
-use Hyperf\Validation\Annotation\Scene;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -23,16 +22,14 @@ use Psr\Http\Message\ResponseInterface;
 #[Controller(prefix: '/admin/index')]
 final class IndexController extends AbstractHttpController
 {
-	private readonly AdministratorService $serviceAdminAdministrator;
-
-	public function __construct()
+	public function __construct(private readonly AdministratorService $serviceAdminAdministrator)
 	{
 	}
 
 	/**
 	 * 登录
 	 *
-	 * @param AdministratorValidator $loginValidator
+	 * @param AdministratorValidator $validator
 	 * @param AdminSecurity          $adminSecurity
 	 *
 	 * @return ResponseInterface
@@ -40,16 +37,17 @@ final class IndexController extends AbstractHttpController
 	 * @api /admin/index/login
 	 */
 	#[
-		RequestMapping(path: 'login', methods: ['POST']),
-		Scene(scene: 'login', argument: 'loginValidator'),
+		RequestMapping(path: 'login', methods: [
+			'GET',
+			'POST',
+		]),
 	]
-	public function login(AdministratorValidator $loginValidator, AdminSecurity $adminSecurity): ResponseInterface
+	public function login(AdministratorValidator $validator, AdminSecurity $adminSecurity): ResponseInterface
 	{
-		$inputs = $loginValidator->validated();
-
+		var_dump(1);
+		$inputs   = $validator->scene('login')->validated();
 		$userinfo = $this->serviceAdminAdministrator->login(... $inputs);
-
-		$token = $adminSecurity->create($userinfo);
+		$token    = $adminSecurity->getToken($userinfo);
 
 		return $this->response->success(
 			data   : $userinfo,
@@ -80,18 +78,5 @@ final class IndexController extends AbstractHttpController
 		$this->serviceAdminAdministrator->logout($token);
 
 		return $this->response->success();
-	}
-
-	/**
-	 * @return void
-	 *
-	 * @api /test
-	 */
-	#[
-		RequestMapping(path: '/test', methods: ['GET']),
-	]
-	public function test()
-	{
-
 	}
 }

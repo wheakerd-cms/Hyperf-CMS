@@ -18,25 +18,26 @@
         ]
     },
     "require": {
-        "php": "^8.3",
+        "php": "*",
         "ext-json": "*",
         "ext-openssl": "*",
+        "ext-pcntl": "*",
         "ext-pdo": "*",
         "ext-pdo_mysql": "*",
         "ext-redis": "*",
-        "alibabacloud/oss-v2": "^0.2.0",
+        "alibabacloud/oss-v2": "^0.3",
         "hyperf/cache": "^3.1",
         "hyperf/command": "^3.1",
         "hyperf/config": "^3.1",
         "hyperf/database": "^3.1",
         "hyperf/db-connection": "^3.1",
-        "hyperf/engine": "^2.13",
+        "hyperf/engine": "2.*",
         "hyperf/framework": "^3.1",
         "hyperf/guzzle": "^3.1",
         "hyperf/http-server": "^3.1",
         "hyperf/logger": "^3.1",
         "hyperf/memory": "^3.1",
-        "hyperf/model-cache": "^3.1",
+        "hyperf/model-cache": "3.2.x-dev",
         "hyperf/phar": "^3.1",
         "hyperf/process": "^3.1",
         "hyperf/redis": "^3.1",
@@ -50,7 +51,7 @@
         "hyperf/devtool": "^3.1",
         "hyperf/watcher": "^3.1",
         "spomky-labs/aes-key-wrap": "^7.0",
-        "swoole/ide-helper": "^5"
+        "swoole/ide-helper": "5.*"
     },
     "autoload": {
         "psr-4": {
