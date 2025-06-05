@@ -4,15 +4,15 @@ declare (strict_types=1);
 namespace App\Dao\Admin;
 
 use App\Abstract\AbstractDao;
-use App\Model\Admin\ModelAdminRouter;
+use App\Model\Admin\MenuModel;
 
 /**
- * @DaoAdminRouter
- * @\App\Dao\Admin\DaoAdminRouter
+ * @MenuDao
+ * @\App\Dao\Admin\MenuDao
  */
-final readonly class DaoAdminRouter extends AbstractDao
+final readonly class MenuDao extends AbstractDao
 {
-	public function __construct(ModelAdminRouter $model)
+	public function __construct(MenuModel $model)
 	{
 		parent::__construct($model);
 	}

@@ -6,16 +6,19 @@ namespace App;
 use App\Contract\ResponseContract;
 use App\Exception\CustomMessageException;
 use App\Exception\LibraryException;
-use Hyperf\Context\RequestContext;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\ExceptionHandler\Annotation\ExceptionHandler;
 use Hyperf\ExceptionHandler\ExceptionHandler as HyperfExceptionHandler;
+use Hyperf\HttpMessage\Exception\MethodNotAllowedHttpException;
 use Hyperf\HttpMessage\Exception\NotFoundHttpException;
+use Hyperf\Logger\LoggerFactory;
 use Hyperf\Validation\ValidationException;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
 use Throwable;
 use function Hyperf\Support\env;
+use function sprintf;
 
 /**
  * @AppExceptionHandler
@@ -24,48 +27,48 @@ use function Hyperf\Support\env;
 #[ExceptionHandler]
 final class AppExceptionHandler extends HyperfExceptionHandler
 {
+	private readonly LoggerInterface $logger;
+
 	public function __construct(
-		private readonly StdoutLoggerInterface $logger,
+		LoggerFactory                          $loggerFactory,
+		private readonly StdoutLoggerInterface $stdoutLogger,
 		private readonly ResponseContract      $response,
 	)
 	{
+		$this->logger = $loggerFactory->get();
+	}
+
+	public function isValid(Throwable $throwable): bool
+	{
+		return true;
 	}
 
 	public function handle(Throwable $throwable, ResponseInterface $response): MessageInterface|ResponseInterface
 	{
-		if ('dev' === env('APP_ENV') || !PHAR_ENABLE) {
-			$this->logger->error(sprintf('%s[%s] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
-			$this->logger->error($throwable->getTraceAsString());
-			$this->logger->error($throwable);
-		}
+		$logger = $this->getLogger();
 
-		if ($throwable instanceof NotFoundHttpException) {
-			return $this->handleNotFound($throwable);
-		}
+		$this->stopPropagation();
+		$logger->error(sprintf('%s[%s] in %s', $throwable->getMessage(), $throwable->getLine(), $throwable->getFile()));
+		$logger->error($throwable->getTraceAsString());
+		$logger->error($throwable);
 
-		if ($throwable instanceof ValidationException) {
-			return $this->handleValidator($throwable);
-		}
+		return match (true) {
+			$throwable instanceof MethodNotAllowedHttpException => $this->handleMethodNotAllowed($throwable),
+			$throwable instanceof NotFoundHttpException         => $this->handleNotFound($throwable),
+			$throwable instanceof ValidationException           => $this->handleValidator($throwable),
+			$throwable instanceof LibraryException              => $this->handleLibrary($throwable),
+			$throwable instanceof CustomMessageException        => $this->handleCustom($throwable),
+			default                                             => $this->response->server('Internal Server Error.'),
+		};
+	}
 
-		if ($throwable instanceof LibraryException) {
-			return $this->handleLibrary($throwable);
-		}
-
-		if ($throwable instanceof CustomMessageException) {
-			return $this->handleCustom($throwable);
-		}
-
-		return $this->response->server('Internal Server Error.');
+	private function getLogger(): LoggerInterface|StdoutLoggerInterface
+	{
+		return env('APP_ENV', 'dev') === 'dev' ? $this->stdoutLogger : $this->logger;
 	}
 
 	public function handleNotFound(NotFoundHttpException $notFoundHttpException): MessageInterface
 	{
-		$this->logger->error(
-			sprintf("\nThe Router Not Found: %s\n",
-			        RequestContext::get()->getUri()->getPath(),
-			),
-		);
-
 		$message = $notFoundHttpException->getMessage();
 
 		return $this->response->error($message);
@@ -80,15 +83,9 @@ final class AppExceptionHandler extends HyperfExceptionHandler
 	 */
 	public function handleValidator(ValidationException $validationException): MessageInterface
 	{
-		$this->stopPropagation();
 		$message = $validationException->validator->errors()->first();
 
 		return $this->response->validator($message);
-	}
-
-	public function isValid(Throwable $throwable): bool
-	{
-		return true;
 	}
 
 	/**
@@ -100,7 +97,6 @@ final class AppExceptionHandler extends HyperfExceptionHandler
 	 */
 	private function handleCustom(CustomMessageException $customMessageException): ResponseInterface
 	{
-		$this->stopPropagation();
 		$message = $customMessageException->getMessage();
 
 		return $this->response->error($message);
@@ -115,9 +111,22 @@ final class AppExceptionHandler extends HyperfExceptionHandler
 	 */
 	private function handleLibrary(LibraryException $libraryException): ResponseInterface
 	{
-		$this->stopPropagation();
 		$message = $libraryException->getMessage();
 
 		return $this->response->error($message);
+	}
+
+	/**
+	 * The exception handler is for methods not allowed.
+	 *
+	 * @param MethodNotAllowedHttpException $throwable
+	 *
+	 * @return ResponseInterface
+	 */
+	private function handleMethodNotAllowed(MethodNotAllowedHttpException $throwable): ResponseInterface
+	{
+		$message = $throwable->getMessage();
+
+		return $this->response->message($message, 403);
 	}
 }

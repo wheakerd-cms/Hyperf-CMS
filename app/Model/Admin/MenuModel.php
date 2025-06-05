@@ -9,8 +9,8 @@ use Carbon\Carbon;
 /**
  * 后台路由表
  *
- * @ModelAdminMenuModel
- * @\App\Model\Admin\ModelAdminMenuModel
+ * @MenuModel
+ * @\App\Model\Admin\MenuModel
  *
  * @property integer $id         主键
  * @property integer $type       类型
@@ -22,7 +22,7 @@ use Carbon\Carbon;
  * @property Carbon  $createTime 创建时间
  * @property Carbon  $updateTime 更新时间
  */
-final class ModelAdminMenuModel extends AbstractModel
+final class MenuModel extends AbstractModel
 {
 	protected ?string $table = 'admin_menu';
 

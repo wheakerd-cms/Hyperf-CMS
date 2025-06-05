@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace App\Abstract;
 
 use App\Exception\CustomMessageException;
+use App\Utils\ArrayFunction;
+use App\Utils\Functions;
 use Hyperf\Database\ConnectionInterface;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Model\Model;
@@ -104,9 +106,8 @@ abstract readonly class AbstractDao
 						if (!$model->isFillable($field)) continue;
 						if (!$model->hasCast($field)) continue;
 
-						$type = $this->model->getCastType($field);
-						$type = strpos($type, ':') ? strstr($type, ':', true) : $type;
-
+						$type  = $this->model->getCastType($field);
+						$type  = strpos($type, ':') ? strstr($type, ':', true) : $type;
 						$query = match ($type) {
 							'boolean',
 							'integer'  => $query->where($field, $value),
@@ -116,7 +117,8 @@ abstract readonly class AbstractDao
 						};
 					}
 				});
-			} elseif ($this->model->isFillable($field)) {
+			}
+			if ($this->model->isFillable($field)) {
 				$field = Str::snake($field);
 
 				if (!$this->model->hasCast($field)) continue;

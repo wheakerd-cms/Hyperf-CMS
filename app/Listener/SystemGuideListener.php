@@ -3,15 +3,20 @@ declare(strict_types=1);
 
 namespace App\Listener;
 
+use App\Abstract\AbstractMigration;
 use Hyperf\Contract\ContainerInterface;
 use Hyperf\Database\ConnectionResolverInterface;
+use Hyperf\Database\Schema\Blueprint;
+use Hyperf\Database\Schema\Schema;
+use Hyperf\Di\ReflectionManager;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
-use Hyperf\Framework\Event\BeforeMainServerStart;
+use Hyperf\Framework\Event\BootApplication;
 use Hyperf\Support\Composer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use RuntimeException;
+use Throwable;
 
 /**
  * 系统引导
@@ -32,7 +37,7 @@ final readonly class SystemGuideListener implements ListenerInterface
 	public function listen(): array
 	{
 		return [
-			BeforeMainServerStart::class,
+			BootApplication::class,
 		];
 	}
 
@@ -46,27 +51,49 @@ final readonly class SystemGuideListener implements ListenerInterface
 	public function process(object $event): void
 	{
 		if (!file_exists(ROOT_PATH . '/.env')) {
-			throw new RuntimeException('The. env configuration file does not exist');
+			throw new RuntimeException('The. env configuration file doesnt exist');
 		}
 
+		/** @noinspection PhpPossiblePolymorphicInvocationInspection */
 		$this->container->get(ConnectionResolverInterface::class)->connection('default')->getSchemaBuilder()->dropAllTables();
 
 		$migrations = $this->getAllMigrations();
 
 		foreach ($migrations as $migration) {
+			/* @phpstan-var AbstractMigration $schema */
 			$schema = $this->container->get($migration);
-			$schema->before();
-			$schema->after();
+
+			Schema::create($schema->table(), fn(Blueprint $blueprint) => $schema->schema($blueprint));
+
+			foreach ($schema->data() as $item) {
+				$instance = $schema->newInstance($item);
+				$instance->save();
+			}
 		}
 	}
 
 	private function getAllMigrations(): array
 	{
-		return array_keys(
-			array_filter(
-				Composer::getLoader()->getClassMap(),
-				fn($classname) => str_starts_with($classname, 'App\\Schema\\'),
-				ARRAY_FILTER_USE_KEY,
-			));
+		$migrations = [];
+
+		$classMap = array_keys(Composer::getLoader()->getClassMap());
+
+		foreach ($classMap as $classname) {
+			try {
+				if (!class_exists($classname)) {
+					continue;
+				}
+				if (!ReflectionManager::reflectClass($classname)->isSubclassOf(AbstractMigration::class)) {
+					continue;
+				}
+
+				$migrations [] = $classname;
+			}
+			catch (Throwable) {
+				continue;
+			}
+		}
+
+		return $migrations;
 	}
 }

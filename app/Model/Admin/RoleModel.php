@@ -52,6 +52,6 @@ final class RoleModel extends AbstractModel
 
 	public function routes(): BelongsToMany
 	{
-		return $this->belongsToMany(ModelAdminMenuModel::class, 'base_role_menu', 'role_id', 'menu_id');
+		return $this->belongsToMany(MenuModel::class, 'base_role_menu', 'role_id', 'menu_id');
 	}
 }

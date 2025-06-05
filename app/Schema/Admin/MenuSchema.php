@@ -4,9 +4,8 @@ declare(strict_types=1);
 namespace App\Schema\Admin;
 
 use App\Abstract\AbstractMigration;
-use App\Model\Admin\ModelAdminMenuModel;
+use App\Model\Admin\MenuModel;
 use Hyperf\Database\Schema\Blueprint;
-use Hyperf\Database\Schema\Schema;
 
 /**
  * @MenuSchema
@@ -14,43 +13,35 @@ use Hyperf\Database\Schema\Schema;
  */
 final class MenuSchema extends AbstractMigration
 {
-	public function __construct(readonly ModelAdminMenuModel $model)
+	public function __construct(MenuModel $model)
 	{
 		parent::__construct($model);
 	}
 
 	/**
+	 * @param Blueprint $blueprint
+	 *
 	 * @return void
 	 */
-	public function before(): void
+	public function schema(Blueprint $blueprint): void
 	{
-		Schema::create($this->model->getTable(), function (Blueprint $blueprint) {
-			$blueprint->increments('id')->nullable(false)->comment('主键');
-
-			$blueprint->unsignedInteger('parent_id')->nullable()->comment('父级路由');
-
-			$blueprint->unsignedTinyInteger('type')->nullable(false)->comment('类型');
-
-			$blueprint->string('title', 255)->nullable(false)->comment('路由名称');
-
-			$blueprint->string('name', 255)->nullable(false)->comment('用户定义的路由记录的可能的名称');
-
-			$blueprint->string('icon', 255)->nullable()->comment('图标');
-
-			$blueprint->unsignedInteger('order')->nullable(false)->default(0)->comment('排序');
-
-			$blueprint->integer('create_time', false, true)->nullable(false)->comment('创建时间');
-
-			$blueprint->integer('update_time', false, true)->nullable(false)->comment('更新时间');
-		});
+		$blueprint->increments('id')->nullable(false)->comment('主键');
+		$blueprint->unsignedInteger('parent_id')->nullable()->comment('父级路由');
+		$blueprint->unsignedTinyInteger('type')->nullable(false)->comment('类型');
+		$blueprint->string('title', 255)->nullable(false)->comment('路由名称');
+		$blueprint->string('name', 255)->nullable(false)->comment('用户定义的路由记录的可能的名称');
+		$blueprint->string('icon', 255)->nullable()->comment('图标');
+		$blueprint->unsignedInteger('order')->nullable(false)->default(0)->comment('排序');
+		$blueprint->unsignedInteger('create_time')->nullable(false)->comment('创建时间');
+		$blueprint->unsignedInteger('update_time')->nullable(false)->comment('更新时间');
 	}
 
 	/**
-	 * @return void
+	 * @return array
 	 */
-	public function after(): void
+	public function data(): array
 	{
-		$data = [
+		return [
 			[
 				'id'       => 1,
 				'parentId' => null,
@@ -142,15 +133,5 @@ final class MenuSchema extends AbstractMigration
 				'order'    => 0,
 			],
 		];
-
-		foreach ($data as $item) {
-			$instance = $this->model->newInstance();
-
-			foreach ($item as $key => $value) {
-				$instance->{$key} = $value;
-			}
-
-			$instance->save();
-		}
 	}
 }

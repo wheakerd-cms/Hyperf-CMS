@@ -4,9 +4,10 @@ declare(strict_types=1);
 namespace App\Security;
 
 use App\Abstract\AbstractSecurity;
-use App\Cache\SystemDefaultCache;
+use App\Cache\Admin\AdministratorCache;
 use App\Library\JsonWebToken\JWA;
-use Jose\Component\Core\JWK;
+use App\Library\JsonWebToken\JWK;
+use Jose\Component\Core\JWK as JoseJWK;
 
 /**
  * @AdminSecurity
@@ -14,17 +15,31 @@ use Jose\Component\Core\JWK;
  */
 final readonly class AdminSecurity extends AbstractSecurity
 {
-	public function __construct(SystemDefaultCache $systemDefaultCache, JWA $jsonWebAlgorithms)
+	public function __construct(private AdministratorCache $cache)
 	{
-		$key              = $systemDefaultCache->getAdminKey();
-		$algorithmManager = $jsonWebAlgorithms->create(['HS256']);
-		$jwk              = new JWK(
+		$jwk = new JoseJWK(
 			[
 				'kty' => 'oct',
-				'k'   => $key,
+				'k'   => $this->getKey(),
 			],
 		);
 
+		$algorithmManager = JWA::create(['HS256']);
+
 		parent::__construct($algorithmManager, $jwk);
+	}
+
+	private function getKey()
+	{
+		$key = $this->cache->getKey();
+
+		//  TODO: Rewrite if the key doesnt exist.
+		if (!$key) {
+			$key = JWK::createOctKey()->get('k');
+
+			$this->cache->setKey($key);
+		}
+
+		return $key;
 	}
 }

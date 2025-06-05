@@ -11,8 +11,8 @@ use Hyperf\ModelCache\Cacheable;
 use Hyperf\ModelCache\CacheableInterface;
 
 /**
- * @ModelAdminAdministrator
- * @\App\Model\Admin\ModelAdminAdministrator
+ * @AdministratorModel
+ * @\App\Model\Admin\AdministratorModel
  *
  * @property integer $id         主键
  * @property string  $username   用户名
@@ -24,7 +24,7 @@ use Hyperf\ModelCache\CacheableInterface;
  * @property Carbon  $createTime 创建时间
  * @property Carbon  $updateTime 更新时间
  */
-final class ModelAdminAdministrator extends AbstractModel implements CacheableInterface
+final class AdministratorModel extends AbstractModel implements CacheableInterface
 {
 	use Cacheable;
 
@@ -75,14 +75,14 @@ final class ModelAdminAdministrator extends AbstractModel implements CacheableIn
 	 */
 	public function roles(): BelongsToMany
 	{
-		return $this->belongsToMany(RoleModel::class, 'base_administrator_role', 'userid', 'role_id');
+		return $this->belongsToMany(AdminRoleModel::class, 'base_administrator_role', 'userid', 'role_id');
 	}
 
 	public function role(): HasOneThrough
 	{
 		return $this->hasOneThrough(
-			related  : RoleModel::class,
-			through  : ModelAdminAdministratorRole::class,
+			related  : AdminRoleModel::class,
+			through  : AdministratorRoleModel::class,
 			firstKey : 'userid',
 			secondKey: 'id',
 		);

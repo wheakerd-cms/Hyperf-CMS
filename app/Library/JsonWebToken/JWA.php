@@ -18,19 +18,19 @@ use Jose\Component\Signature\Algorithm\{
 };
 
 /**
- * 算法管理器工厂
- *
  * @JWA
  * @\App\Library\JWT\JWA
  */
-final readonly class JWA
+final class JWA
 {
+	private static ?self $instance = null;
+
 	/**
 	 * @param AlgorithmManagerFactory $algorithmManagerFactory 算法管理器工厂
 	 *
 	 * @noinspection SpellCheckingInspection
 	 */
-	public function __construct(private AlgorithmManagerFactory $algorithmManagerFactory)
+	public function __construct(private readonly AlgorithmManagerFactory $algorithmManagerFactory)
 	{
 		$this->algorithmManagerFactory->add('A128CBC-HS256', new A128CBCHS256());
 		$this->algorithmManagerFactory->add('A256KW', new A256KW());
@@ -50,8 +50,13 @@ final readonly class JWA
 	 *
 	 * @return AlgorithmManager
 	 */
-	public function create(array $algorithms): AlgorithmManager
+	public static function create(array $algorithms): AlgorithmManager
 	{
-		return $this->algorithmManagerFactory->create($algorithms);
+		return self::getInstance()->algorithmManagerFactory->create($algorithms);
+	}
+
+	private static function getInstance(): JWA
+	{
+		return self::$instance ??= new JWA(new AlgorithmManagerFactory);
 	}
 }

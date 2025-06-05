@@ -12,13 +12,8 @@ use RuntimeException;
  */
 abstract readonly class AbstractCache
 {
-	public function __construct(protected Redis $redis, protected string $prefix = '')
+	public function __construct(protected Redis $redis)
 	{
-	}
-
-	final protected function getKey(string $key): string
-	{
-		return $this->prefix . ':' . $key;
 	}
 
 	/**
@@ -34,11 +29,13 @@ abstract readonly class AbstractCache
 		$lockKey   = "read_lock:$key";
 		$lockValue = uniqid(more_entropy: true);
 
-		// 加锁（过期时间 3 秒，防止死锁）
-		if (!$this->redis->set($lockKey, $lockValue, [
+		$res = $this->redis->set($lockKey, $lockValue, [
 			'NX',
 			'PX' => $ttl,
-		])) {
+		]);
+
+		// 加锁（过期时间 3 秒，防止死锁）
+		if (!$res) {
 			throw new RuntimeException('Failed to acquire read lock');
 		}
 

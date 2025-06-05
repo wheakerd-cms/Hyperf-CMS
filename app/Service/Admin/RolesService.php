@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace App\Service\Admin;
 
 use App\Abstract\AbstractService;
-use App\Dao\Admin\DaoAdminRoles;
+use App\Dao\Admin\RoleDao;
 
 /**
  * @RolesService
@@ -13,7 +13,7 @@ use App\Dao\Admin\DaoAdminRoles;
 final class RolesService extends AbstractService
 {
 	public function __construct(
-		private readonly DaoAdminRoles $dao,
+		private readonly RoleDao $dao,
 	)
 	{
 	}

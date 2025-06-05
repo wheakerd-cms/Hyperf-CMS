@@ -1,11 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Model\Base;
+namespace App\Model\Admin;
 
 use App\Abstract\AbstractModel;
-use App\Model\Admin\AdminRoleModel;
-use Hyperf\Database\Model\Relations\MorphTo;
 
 /**
  * 后台角色与菜单的中间表
@@ -19,7 +17,7 @@ use Hyperf\Database\Model\Relations\MorphTo;
  */
 final class RoleMenuModel extends AbstractModel
 {
-	protected ?string $table = 'base_role_menu';
+	protected ?string $table = 'admin_role_menu';
 
 	public bool $timestamps = false;
 
@@ -34,9 +32,4 @@ final class RoleMenuModel extends AbstractModel
 		'role_id' => 'integer',
 		'menu_id' => 'integer',
 	];
-
-	public function role(): MorphTo
-	{
-		return $this->morphTo(AdminRoleModel::class . 'role_id', '');
-	}
 }

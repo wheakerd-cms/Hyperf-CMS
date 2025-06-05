@@ -9,8 +9,10 @@ use Jose\Component\Checker\{
 	AlgorithmChecker,
 	HeaderCheckerManager,
 };
-use Jose\Component\Core\AlgorithmManager;
-use Jose\Component\Core\JWK;
+use Jose\Component\Core\{
+	AlgorithmManager,
+	JWK,
+};
 use Jose\Component\Signature\{
 	JWSBuilder,
 	JWSLoader,
@@ -26,7 +28,7 @@ use Jose\Component\Signature\{
  */
 abstract readonly class AbstractSecurity
 {
-	public function __construct(private AlgorithmManager $algorithmManager, private JWK $jwk)
+	public function __construct(protected AlgorithmManager $algorithmManager, protected JWK $jwk)
 	{
 	}
 
@@ -35,12 +37,12 @@ abstract readonly class AbstractSecurity
 	 * @/param array $aud 受众者
 	 *
 	 * @param mixed    $payload        载荷信息
-	 * @param int      $expirationTime 有效时长，默认一个小时
+	 * @param int      $expirationTime 有效时长，默认一个月
 	 * @param int|null $nowTime        令牌生效时间
 	 *
 	 * @return string
 	 */
-	public function getToken(mixed $payload = [], int $expirationTime = 60 * 60 * 24 * 30, ?int $nowTime = null): string
+	public function create(mixed $payload = [], int $expirationTime = 60 * 60 * 24 * 30, ?int $nowTime = null): string
 	{
 		$nowTime ??= Carbon::now()->getTimestamp();
 
@@ -95,31 +97,18 @@ abstract readonly class AbstractSecurity
 	}
 
 	/**
-	 * 换取令牌
-	 *
-	 * @param string $token
-	 * @param int    $expirationTime
-	 *
-	 * @return false|string
-	 */
-	final public function barter(string $token, int $expirationTime = 3600): false|string
-	{
-		return $this->getToken(
-			payload       : (array)$this->getPayload($token),
-			expirationTime: $expirationTime,
-		);
-	}
-
-	/**
 	 * 获取载荷
 	 *
 	 * @param string $token
 	 *
 	 * @return object{
-	 *
+	 *     iat: integer,
+	 *     nbf: integer,
+	 *     exp: integer,
+	 *     data: mixed,
 	 * }
 	 */
-	final public function getPayload(string $token): object
+	public function payload(string $token): object
 	{
 		$serializerManager = new JWSSerializerManager(
 			[

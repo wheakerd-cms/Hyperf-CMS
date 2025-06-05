@@ -4,7 +4,8 @@ declare(strict_types=1);
 namespace App\Cache\Admin;
 
 use App\Abstract\AbstractCache;
-use App\Proxy\AdminRedisProxy;
+use App\Library\JsonWebToken\JWK;
+use App\Proxy\DefaultRedisProxy;
 
 /**
  * @AdministratorCache
@@ -12,25 +13,19 @@ use App\Proxy\AdminRedisProxy;
  */
 final readonly class AdministratorCache extends AbstractCache
 {
-	public function __construct(AdminRedisProxy $redis)
+	public function __construct(DefaultRedisProxy $redis)
 	{
-		parent::__construct($redis, self::class);
+		parent::__construct($redis);
 	}
 
-	/**
-	 * 获取用户ID
-	 *
-	 * @param string $token
-	 *
-	 * @return false|int
-	 */
-	public function getToken(string $token): false|int
+	public function setKey(?string $key = null): void
 	{
-		$value = $this->redis->get($this->getKey($token));
+		$this->redis->set('admin_key', $key ?? JWK::createOctKey()->get('k'));
+	}
 
-		if (false === $value) return false;
-
-		return (integer)$value;
+	public function getKey(): false|string
+	{
+		return $this->redis->get('admin_key');
 	}
 
 	/**
@@ -42,7 +37,7 @@ final readonly class AdministratorCache extends AbstractCache
 	 */
 	public function hasToken(string $token): false|int
 	{
-		return $this->redis->get($this->getKey($token));
+		return false !== $this->redis->get($token);
 	}
 
 	/**
