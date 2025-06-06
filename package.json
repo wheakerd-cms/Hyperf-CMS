@@ -1,8 +1,9 @@
 {
     "name": "document",
+    "version": "1.0.0",
+    "description": "本文档存根便于前后端联合开发制定，后续开发者可自行选择是否复用。",
     "scripts": {
-        "install": "npm install docsify-cli --save-dev",
-        "docs": "docsify serve ./docs"
+        "docs": "docsify serve ./docs --port 3001"
     },
     "engines": {
         "node": ">=22.0",

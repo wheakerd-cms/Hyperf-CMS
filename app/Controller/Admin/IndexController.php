@@ -7,45 +7,49 @@ use App\Abstract\AbstractHttpController;
 use App\Middleware\Authentication\AuthenticationMiddleware;
 use App\Security\AdminSecurity;
 use App\Service\Admin\AdministratorService;
-use App\Validator\Admin\ValidatorAdminAdministrator;
+use App\Validator\Admin\IndexValidator;
 use Gregwar\Captcha\CaptchaBuilder;
+use Hyperf\Context\Context;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middlewares;
 use Hyperf\HttpServer\Annotation\RequestMapping;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * 零碎功能
+ * Fragmented functions.
  *
  * @IndexController
  * @\App\Controller\Admin\IndexController
  */
-#[Controller(prefix: '/admin/index')]
+#[
+	Controller(prefix: '/admin/index'),
+]
 final class IndexController extends AbstractHttpController
 {
-	public function __construct(private readonly AdministratorService $serviceAdminAdministrator)
+	public function __construct(
+		private readonly IndexValidator       $validator,
+		private readonly AdminSecurity        $security,
+		private readonly AdministratorService $serviceAdminAdministrator,
+	)
 	{
 	}
 
 	/**
 	 * 登录
 	 *
-	 * @param ValidatorAdminAdministrator $validator
-	 * @param AdminSecurity               $security
-	 *
 	 * @return ResponseInterface
 	 *
-	 * @api /admin/index/login
+	 * @api {post} /admin/index/login
 	 */
 	#[
 		RequestMapping(path: 'login', methods: 'POST'),
 	]
-	public function login(ValidatorAdminAdministrator $validator, AdminSecurity $security): ResponseInterface
+	public function login(): ResponseInterface
 	{
-		$inputs   = $validator->login();
+		$inputs   = $this->validator->login();
 		$userinfo = $this->serviceAdminAdministrator->login(... $inputs);
 		$userid   = $userinfo->id;
-		$token    = $security->create($userid);
+		$token    = $this->security->create($userid);
 
 		$this->session->set('userid', $userid);
 
@@ -58,14 +62,34 @@ final class IndexController extends AbstractHttpController
 	}
 
 	/**
+	 * Get the userinfo.
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @api {get} /admin/index/userinfo
+	 */
+	#[
+		RequestMapping(path: 'userinfo', methods: 'GET'),
+		Middlewares([
+			AuthenticationMiddleware::class,
+		]),
+	]
+	public function userinfo(): ResponseInterface
+	{
+		$userinfo = Context::get('userinfo');
+
+		return $this->response->success($userinfo);
+	}
+
+	/**
 	 * 登出
 	 *
 	 * @return ResponseInterface
 	 *
-	 * @api /admin/index/logout
+	 * @api {post} /admin/index/logout
 	 */
 	#[
-		RequestMapping(path: 'logout', methods: ['POST']),
+		RequestMapping(path: 'logout', methods: 'POST'),
 		Middlewares([
 			AuthenticationMiddleware::class,
 		]),
@@ -80,10 +104,17 @@ final class IndexController extends AbstractHttpController
 		return $this->response->success();
 	}
 
+	/**
+	 * Get a captcha.
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @api {get} /admin/index/captcha
+	 */
 	#[
-		RequestMapping(path: 'captcha', methods: ['GET']),
+		RequestMapping(path: 'captcha', methods: 'GET'),
 	]
-	public function captcha(): void
+	public function captcha(): ResponseInterface
 	{
 		$builder = (new CaptchaBuilder())->build();
 		$phrase  = $builder->getPhrase();
@@ -94,12 +125,8 @@ final class IndexController extends AbstractHttpController
 		$builder->output();
 		$image = ob_get_clean();
 
-		$response = $this->response->getSocket();
+		$base64 = 'data:image/png;base64,' . base64_encode($image);
 
-		$response->setHeader('Content-Type', 'image/png');
-		$response->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-		$response->setHeader('Pragma', 'no-cache');
-
-		$response->end($image);
+		return $this->response->success($base64);
 	}
 }

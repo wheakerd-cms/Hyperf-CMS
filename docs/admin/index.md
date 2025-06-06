@@ -1,18 +1,19 @@
-## 零碎功能
+#
 
-### 获取验证码 :id=get-captcha
+> # 获取验证码 :id=get-captcha
 
 - **URL**: `/admin/index/captcha`
 - **方法**: `GET`
 
 #### 请求参数
+
 无
 
 #### 返回示例
 
 图片资源
 
-### 登录 :id=login
+> # 登录 :id=login
 
 - **URL**: `/admin/index/login`
 - **方法**: `POST`
@@ -30,3 +31,34 @@
 #### 返回示例
 
 图片资源
+
+> # 获取用户信息 :id=userinfo
+
+- **URL**: `/admin/index/userinfo`
+- **方法**: `GET`
+
+#### 请求参数
+
+无
+
+#### 返回示例
+
+```typescript
+{
+    username: string;
+    nickname: string;
+}
+```
+
+> # 退出登录 :id=logout
+
+- **URL**: `/admin/index/logout`
+- **方法**: `GET`
+
+#### 请求参数
+
+无
+
+#### 返回示例
+
+无

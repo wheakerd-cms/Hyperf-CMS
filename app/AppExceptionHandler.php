@@ -97,9 +97,10 @@ final class AppExceptionHandler extends HyperfExceptionHandler
 	 */
 	private function handleCustom(CustomMessageException $customMessageException): ResponseInterface
 	{
-		$message = $customMessageException->getMessage();
+		$message    = $customMessageException->getMessage();
+		$statusCode = $customMessageException->getCode();
 
-		return $this->response->error($message);
+		return $this->response->message($message, $statusCode);
 	}
 
 	/**

@@ -6,12 +6,13 @@ namespace App\Validator\Admin;
 use App\Abstract\AbstractValidator;
 use App\Exception\CustomMessageException;
 use Hyperf\Contract\SessionInterface;
+use Hyperf\Stringable\Str;
 
 /**
- * @ValidatorAdminAdministrator
- * @\App\Validator\Admin\ValidatorAdminAdministrator
+ * @IndexValidator
+ * @\App\Validator\Admin\IndexValidator
  */
-final class ValidatorAdminAdministrator extends AbstractValidator
+final class IndexValidator extends AbstractValidator
 {
 	public function __construct(private readonly SessionInterface $session)
 	{
@@ -20,17 +21,19 @@ final class ValidatorAdminAdministrator extends AbstractValidator
 	public function login(): array
 	{
 		$inputs = $this->validatorFactory->make($this->request->all(), [
-			'username' => 'required|string|between:5,8',
-			'password' => 'required|string|between:6,12',
+			'username' => 'required|string|max:20',
+			'password' => 'required|string',
 			'captcha'  => 'required|string|size:5',
 		])->validate();
 
 		$captcha = $inputs['captcha'];
+		unset($inputs['captcha']);
 
-		$code = $this->session->get('captcha');
+		$code = $this->session->get('captcha') ?? '';
+		$code = Str::lower($code);
 
 		if (!hash_equals($code, $captcha)) {
-			throw new CustomMessageException('验证码不正确，请刷新后重试');
+			throw new CustomMessageException('验证码不正确，请刷新后重试', 400);
 		}
 
 		return $inputs;

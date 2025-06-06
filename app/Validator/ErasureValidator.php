@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Validator\Admin;
+namespace App\Validator;
 
 use Hyperf\Validation\Request\FormRequest;
 
@@ -9,7 +9,7 @@ use Hyperf\Validation\Request\FormRequest;
  * 删除接口的通用验证器
  *
  * @ErasureValidator
- * @\App\Validator\Admin\ErasureValidator
+ * @\App\Validator\ErasureValidator
  */
 final class ErasureValidator extends FormRequest
 {

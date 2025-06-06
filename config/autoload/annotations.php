@@ -8,6 +8,7 @@ return [
 		],
 		'ignore_annotations' => [
 			'assets',
+			'node_modules',
 			'mixin',
 		],
 	],

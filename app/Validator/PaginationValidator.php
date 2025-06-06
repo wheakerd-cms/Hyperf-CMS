@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Validator\Admin;
+namespace App\Validator;
 
 use Hyperf\Validation\Request\FormRequest;
 
@@ -9,7 +9,7 @@ use Hyperf\Validation\Request\FormRequest;
  * 表格分页的通用验证器
  *
  * @PaginationValidator
- * @\App\Validator\Admin\PaginationValidator
+ * @\App\Validator\PaginationValidator
  */
 final class PaginationValidator extends FormRequest
 {

@@ -50,7 +50,12 @@ final class AdministratorService extends AbstractService
 			throw new CustomMessageException('该账号已被禁用');
 		}
 
-		return (object)$userinfo->toArray();
+		return (object)$userinfo->makeVisible(
+			[
+				'username',
+				'avatar',
+			],
+		)->toArray();
 	}
 
 	/**
