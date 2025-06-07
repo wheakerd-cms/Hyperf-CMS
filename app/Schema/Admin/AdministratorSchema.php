@@ -26,9 +26,10 @@ final class AdministratorSchema extends AbstractMigration
 	public function schema(Blueprint $blueprint): void
 	{
 		$blueprint->increments('id')->nullable(false)->comment('主键');
-		$blueprint->string('username', 20)->nullable(false)->comment('用户名');
+		$blueprint->string('username', 20)->nullable(false)->comment('用户名')->unique();
 		$blueprint->string('password', 255)->nullable(false)->comment('密码（此字段数据较为特殊,请查阅加密算法文档）');
 		$blueprint->unsignedTinyInteger('status')->nullable(false)->default(false)->comment('账号状态，true为正常，false为封禁');
+		$blueprint->string('nickname', 20)->nullable()->comment('昵称');
 		$blueprint->unsignedTinyInteger('is_system')->nullable(false)->default(false)->comment('系统管理员，true为系统管理员，false为非系统管理员');
 		$blueprint->string('avatar', 255)->nullable()->comment('账号头像');
 		$blueprint->unsignedInteger('create_time')->nullable(false)->comment('创建时间');
@@ -43,11 +44,14 @@ final class AdministratorSchema extends AbstractMigration
 		return [
 			[
 				'username' => 'administrator',
+				'nickname' => 'administrator',
 				'password' => '123456',
 				'status'   => true,
+				'isSystem' => true,
 			],
 			[
 				'username' => 'admin',
+				'nickname' => 'admin',
 				'password' => '123456',
 				'status'   => true,
 			],

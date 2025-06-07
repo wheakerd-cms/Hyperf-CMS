@@ -7,6 +7,9 @@ use App\Abstract\AbstractHttpController;
 use App\Dao\Admin\AdministratorDao;
 use App\Middleware\Authentication\AuthenticationMiddleware;
 use App\Validator\Admin\AdministratorValidator;
+use App\Validator\ErasureValidator;
+use App\Validator\PaginationValidator;
+use Hyperf\Database\Exception\UniqueConstraintViolationException;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\Middlewares;
 use Hyperf\HttpServer\Annotation\RequestMapping;
@@ -37,13 +40,18 @@ final class AdministratorController extends AbstractHttpController
 	 * @api {post} /admin/permission/administrator/save
 	 */
 	#[
-		RequestMapping(path: 'save', methods: 'POST'),
+		RequestMapping(path: 'save', methods: 'post'),
 	]
 	public function save(): ResponseInterface
 	{
 		$inputs = $this->validator->save();
 
-		$this->dao->save($inputs);
+		try {
+			$this->dao->save($inputs);
+		}
+		catch (UniqueConstraintViolationException) {
+			return $this->response->error('新增账号不得与现有账户名称重复');
+		}
 
 		return $this->response->success();
 	}
@@ -54,7 +62,7 @@ final class AdministratorController extends AbstractHttpController
 	 * @api {patch} /admin/permission/administrator/changeStatus
 	 */
 	#[
-		RequestMapping(path: 'changeStatus', methods: 'PATCH'),
+		RequestMapping(path: 'changeStatus', methods: 'patch'),
 	]
 	public function changeStatus(): ResponseInterface
 	{
@@ -63,5 +71,43 @@ final class AdministratorController extends AbstractHttpController
 		$this->dao->save($inputs);
 
 		return $this->response->success();
+	}
+
+	/**
+	 * @param ErasureValidator $validator
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @api {delete} /admin/permission/administrator/delete
+	 */
+	#[
+		RequestMapping(path: 'delete', methods: 'delete'),
+	]
+	public function delete(ErasureValidator $validator): ResponseInterface
+	{
+		$inputs = $validator->validated();
+
+		$this->dao->delete($inputs);
+
+		return $this->response->success();
+	}
+
+	/**
+	 * @param PaginationValidator $validator
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @api {get} /admin/permission/administrator/table
+	 */
+	#[
+		RequestMapping(path: 'table', methods: 'get'),
+	]
+	public function table(PaginationValidator $validator): ResponseInterface
+	{
+		$inputs = $validator->validated();
+
+		return $this->response->success(
+			$this->dao->table(...$inputs),
+		);
 	}
 }

@@ -1,4 +1,7 @@
 - [首页](/)
 - 后台
     - [零碎功能](admin/index.md)
-    - [管理员管理](admin/administrator.md)
+    - 权限管理
+        - [菜单管理](admin/permission/menu.md)
+        - [角色管理](admin/permission/role.md)
+        - [管理员管理](admin/permission/administrator.md)

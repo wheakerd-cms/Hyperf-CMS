@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace App\Abstract;
 
 use App\Exception\CustomMessageException;
-use App\Utils\ArrayFunction;
-use App\Utils\Functions;
 use Hyperf\Database\ConnectionInterface;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Model\Model;
@@ -24,7 +22,7 @@ use RuntimeException;
  */
 abstract readonly class AbstractDao
 {
-	public function __construct(private AbstractModel $model)
+	public function __construct(protected AbstractModel $model)
 	{
 	}
 
@@ -35,7 +33,7 @@ abstract readonly class AbstractDao
 	 *
 	 * @return bool
 	 */
-	final public function delete(array|int $ids): bool
+	public function delete(array|int $ids): bool
 	{
 		$dataset = [];
 
@@ -49,7 +47,9 @@ abstract readonly class AbstractDao
 		}
 
 		if (count($ids) > 1 && !empty($dataset)) {
-			throw new CustomMessageException('ID为 %s的数据删除失败，请刷新后重试以检查数据是否存在！');
+			throw new CustomMessageException(
+				sprintf('ID为 [%s] 的数据删除失败，请刷新后重试以检查数据是否存在！', implode(',', $dataset)),
+			);
 		}
 
 		return !empty($dataset);
@@ -60,7 +60,7 @@ abstract readonly class AbstractDao
 	 *
 	 * @return bool
 	 */
-	final public function save(array $inputs): bool
+	public function save(array $inputs): bool
 	{
 		$primaryKey = $this->model->getKeyName();
 
@@ -106,7 +106,8 @@ abstract readonly class AbstractDao
 						if (!$model->isFillable($field)) continue;
 						if (!$model->hasCast($field)) continue;
 
-						$type  = $this->model->getCastType($field);
+						/** @noinspection PhpDynamicAsStaticMethodCallInspection */
+						$type  = $this->model::getCastType($field);
 						$type  = strpos($type, ':') ? strstr($type, ':', true) : $type;
 						$query = match ($type) {
 							'boolean',
@@ -123,7 +124,8 @@ abstract readonly class AbstractDao
 
 				if (!$this->model->hasCast($field)) continue;
 
-				$type = $this->model->getCastType($field);
+				/** @noinspection PhpDynamicAsStaticMethodCallInspection */
+				$type = $this->model::getCastType($field);
 				$type = strpos($type, ':') ? strstr($type, ':', true) : $type;
 
 				$query = match ($type) {

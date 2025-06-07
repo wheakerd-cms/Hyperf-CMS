@@ -5,6 +5,7 @@ namespace App\Dao\Admin;
 
 use App\Abstract\AbstractDao;
 use App\Model\Admin\MenuModel;
+use App\Utils\ArrayFunction;
 
 /**
  * @MenuDao
@@ -25,5 +26,15 @@ final readonly class MenuDao extends AbstractDao
 	public function getSelectInId(array $routerIds): array
 	{
 		return $this->newQuery->find($routerIds)->toArray();
+	}
+
+	public function getList(): array
+	{
+		$list = $this->newQuery->get()->map(function (MenuModel $model) {
+			$model['typeName'] = $model->type()->get()->where('id', $model->type)->value('name') ?? 'UNKNOWN';
+			return $model;
+		})->toArray();
+
+		return ArrayFunction::listTree($list, 'id', 'parentId');
 	}
 }

@@ -17,22 +17,31 @@ final class AdministratorValidator extends AbstractValidator
 
 	public function save(): array
 	{
-		$inputs = $this->validatorFactory->make($this->request->post(), [
-			'id'       => 'sometimes|integer:strict',
-			'username' => 'required|string',
-			'status'   => 'required|boolean:strict',
-			'nickname' => 'required|string',
-			'password' => 'required|string',
-		])->validate();
-
-		//  TODO: check password
-
-		return $inputs;
+		return $this->validatorFactory->make(
+			$this->request->post(),
+			[
+				'id'       => 'sometimes|integer:strict',
+				'username' => 'required|string',
+				'password' => 'required|string|between:6,16|regex:/^[a-zA-Z0-9_]+$/',
+				'status'   => 'required|boolean:strict',
+				'nickname' => 'sometimes|string|max:20|regex:/^[\p{Han}a-zA-Z0-9_]+$/u',
+			],
+			[
+				'username.required' => '用户名不能为空',
+				'username.string'   => '用户名必须是字符串',
+				'username.between'  => '用户名长度在:min-:max个字符之间',
+				'username.regex'    => '用户名必须是由大小写字母、0-9以及_组成',
+				'password.required' => '密码不能为空',
+				'password.string'   => '密码必须是字符串',
+				'password.max'      => '用户名长度在:min-:max个字符之间',
+				'password.regex'    => '用户名必须是由大小写字母、0-9以及_组成',
+			],
+		)->validate();
 	}
 
 	public function changeStatus(): array
 	{
-		return $this->validatorFactory->make($this->request->all(), [
+		return $this->validatorFactory->make($this->request->post(), [
 			'id'     => 'required|integer:strict',
 			'status' => 'required|boolean:strict',
 		])->validate();

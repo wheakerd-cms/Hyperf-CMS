@@ -5,6 +5,7 @@ namespace App\Model\Admin;
 
 use App\Abstract\AbstractModel;
 use Carbon\Carbon;
+use Hyperf\Database\Model\Relations\BelongsTo;
 
 /**
  * 后台路由表
@@ -49,4 +50,9 @@ final class MenuModel extends AbstractModel
 		'create_time' => 'datetime:Y-m-d H:i:s',
 		'update_time' => 'datetime:Y-m-d H:i:s',
 	];
+
+	public function type(): BelongsTo
+	{
+		return $this->belongsTo(MenuTypeModel::class, 'type', 'id');
+	}
 }

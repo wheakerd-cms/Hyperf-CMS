@@ -27,7 +27,6 @@ final class RoleSchema extends AbstractMigration
 	{
 		$blueprint->increments('id')->nullable(false)->comment('主键');
 		$blueprint->string('name', 20)->nullable()->comment('角色名称');
-		$blueprint->boolean('is_system')->nullable(false)->default(false)->comment('是否为系统管理员');
 		$blueprint->unsignedInteger('create_time')->nullable(false)->comment('创建时间');
 		$blueprint->unsignedInteger('update_time')->nullable(false)->comment('更新时间');
 	}
@@ -38,11 +37,6 @@ final class RoleSchema extends AbstractMigration
 	public function data(): array
 	{
 		return [
-			[
-				'id'       => 1,
-				'name'     => '系统管理员',
-				'isSystem' => true,
-			],
 			[
 				'id'   => 2,
 				'name' => '超级管理员',

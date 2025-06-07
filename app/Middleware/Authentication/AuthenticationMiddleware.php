@@ -38,10 +38,15 @@ final readonly class AuthenticationMiddleware implements MiddlewareInterface
 	 */
 	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
 	{
-		$token  = $this->getAuthorization();
 		$userid = $this->session->get('userid');
 
 		if (is_null($userid)) {
+			goto loginAgain;
+		}
+
+		$token = $request->getHeaderLine('Authorization');
+
+		if (!$this->security->verify($token)) {
 			goto loginAgain;
 		}
 
@@ -67,8 +72,8 @@ final readonly class AuthenticationMiddleware implements MiddlewareInterface
 		$response = $handler->handle($request);
 
 		//  TODO: Reissue the voucher.
-		if (!$this->security->verify($token)) {
-			$newToken = $this->barter($userinfo);
+		$newToken = $this->barter($payload);
+		if (!is_null($newToken)) {
 			$response = $response->withHeader('Authorization', $newToken);
 		}
 
@@ -76,13 +81,6 @@ final readonly class AuthenticationMiddleware implements MiddlewareInterface
 
 		loginAgain:
 		return $this->response->auth('未登录或者登录已过期，请重新登录');
-	}
-
-	private function getAuthorization(): ?string
-	{
-		$token = RequestContext::get()->getHeaderLine('Authorization');
-
-		return !strlen($token) ? $token : null;
 	}
 
 	/**
