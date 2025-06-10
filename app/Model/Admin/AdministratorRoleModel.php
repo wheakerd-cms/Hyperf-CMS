@@ -11,23 +11,25 @@ use App\Abstract\AbstractModel;
  * @AdministratorRoleModel
  * @\App\Model\Admin\AdministratorRoleModel
  *
- * @property int $id     主键
- * @property int $userid 管理员ID
- * @property int $roleId 角色ID
+ * @property int $id      主键
+ * @property int $adminId 管理员ID
+ * @property int $roleId  角色ID
  */
 final class AdministratorRoleModel extends AbstractModel
 {
-	protected ?string $table = 'base_administrator_role';
+	protected ?string $table = 'admin_administrator_role';
+
+	public bool $timestamps = false;
 
 	protected array $fillable = [
 		'id',
-		'userid',
+		'admin_id',
 		'role_id',
 	];
 
 	protected array $casts = [
-		'id'      => 'integer',
-		'userid'  => 'integer',
-		'role_id' => 'integer',
+		'id'       => 'integer',
+		'admin_id' => 'integer',
+		'role_id'  => 'integer',
 	];
 }

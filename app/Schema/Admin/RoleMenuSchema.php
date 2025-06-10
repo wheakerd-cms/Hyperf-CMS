@@ -30,6 +30,87 @@ final class RoleMenuSchema extends AbstractMigration
 	 */
 	public function data(): array
 	{
-		return [];
+		return [
+			[
+				'roleId' => 1,
+				'menuId' => 1,
+			],
+			[
+				'roleId' => 1,
+				'menuId' => 2,
+			],
+			[
+				'roleId' => 1,
+				'menuId' => 3,
+			],
+			[
+				'roleId' => 1,
+				'menuId' => 4,
+			],
+			[
+				'roleId' => 1,
+				'menuId' => 5,
+			],
+			[
+				'roleId' => 1,
+				'menuId' => 6,
+			],
+			[
+				'roleId' => 1,
+				'menuId' => 7,
+			],
+			[
+				'roleId' => 1,
+				'menuId' => 8,
+			],
+			[
+				'roleId' => 1,
+				'menuId' => 9,
+			],
+			[
+				'roleId' => 1,
+				'menuId' => 10,
+			],
+			[
+				'roleId' => 2,
+				'menuId' => 1,
+			],
+			[
+				'roleId' => 2,
+				'menuId' => 2,
+			],
+			[
+				'roleId' => 2,
+				'menuId' => 3,
+			],
+			[
+				'roleId' => 2,
+				'menuId' => 4,
+			],
+			[
+				'roleId' => 2,
+				'menuId' => 5,
+			],
+			[
+				'roleId' => 2,
+				'menuId' => 6,
+			],
+			[
+				'roleId' => 2,
+				'menuId' => 7,
+			],
+			[
+				'roleId' => 2,
+				'menuId' => 8,
+			],
+			[
+				'roleId' => 2,
+				'menuId' => 9,
+			],
+			[
+				'roleId' => 2,
+				'menuId' => 10,
+			],
+		];
 	}
 }

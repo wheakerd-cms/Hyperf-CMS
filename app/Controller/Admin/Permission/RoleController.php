@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controller\Admin\Permission;
 
 use App\Abstract\AbstractHttpController;
+use App\Dao\Admin\MenuDao;
 use App\Dao\Admin\RoleDao;
 use App\Middleware\Authentication\AuthenticationMiddleware;
 use App\Validator\Admin\RoleValidator;
@@ -83,5 +84,21 @@ final class RoleController extends AbstractHttpController
 		$this->dao->delete($ids);
 
 		return $this->response->success();
+	}
+
+	/**
+	 * @param MenuDao $dao
+	 *
+	 * @return ResponseInterface
+	 * @api {get} /admin/permission/role/routes
+	 */
+	#[
+		RequestMapping(path: 'routes', methods: 'get'),
+	]
+	public function routes(MenuDao $dao): ResponseInterface
+	{
+		return $this->response->success(
+			$dao->getList(),
+		);
 	}
 }

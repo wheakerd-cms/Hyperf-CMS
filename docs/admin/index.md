@@ -16,7 +16,7 @@
 > # 登录 :id=login
 
 - **URL**: `/admin/index/login`
-- **方法**: `POST`
+- **方法**: `post`
 
 #### 请求参数
 
@@ -31,6 +31,11 @@
 #### 返回示例
 
 图片资源
+
+> # 获取路由 :id=routes
+
+- **URL**: `/admin/index/routes`
+- **方法**: `get`
 
 > # 获取用户信息 :id=userinfo
 

@@ -1,5 +1,14 @@
 #
 
+> # 所有菜单路由 :id=routes
+
+- **URL**: `/admin/permission/role/routes`
+- **方法**: `get`
+
+#### 返回示例
+
+/
+
 > # 新增、编辑 :id=save
 
 - **URL**: `/admin/permission/role/save`

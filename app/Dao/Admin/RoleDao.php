@@ -46,7 +46,7 @@ final readonly class RoleDao extends AbstractDao
 			$model->name = $name;
 			$model->save();
 
-			$roleMenuRelation = $model->roleMenu();
+			$roleMenuRelation = $model->routes();
 
 			if (!is_null($id)) {
 				$roleMenuRelation->delete();
@@ -72,17 +72,5 @@ final readonly class RoleDao extends AbstractDao
 		}
 
 		return true;
-	}
-
-	public function getRouters(int $id): array
-	{
-		/** @var RoleModel $routers */
-		$routers = $this->newQuery->find($id);
-
-		if (empty($routers) || !$routers->status) {
-			return [];
-		}
-
-		return $routers->router;
 	}
 }

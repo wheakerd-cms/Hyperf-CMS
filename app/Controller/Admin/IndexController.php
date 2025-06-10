@@ -6,7 +6,7 @@ namespace App\Controller\Admin;
 use App\Abstract\AbstractHttpController;
 use App\Middleware\Authentication\AuthenticationMiddleware;
 use App\Security\AdminSecurity;
-use App\Service\Admin\AdministratorService;
+use App\Service\Admin\PermissionService;
 use App\Validator\Admin\IndexValidator;
 use Gregwar\Captcha\CaptchaBuilder;
 use Hyperf\Context\Context;
@@ -27,11 +27,37 @@ use Psr\Http\Message\ResponseInterface;
 final class IndexController extends AbstractHttpController
 {
 	public function __construct(
-		private readonly IndexValidator       $validator,
-		private readonly AdminSecurity        $security,
-		private readonly AdministratorService $serviceAdminAdministrator,
+		private readonly IndexValidator    $validator,
+		private readonly AdminSecurity     $security,
+		private readonly PermissionService $permissionService,
 	)
 	{
+	}
+
+	/**
+	 * Get a captcha.
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @api {get} /admin/index/captcha
+	 */
+	#[
+		RequestMapping(path: 'captcha', methods: 'GET'),
+	]
+	public function captcha(): ResponseInterface
+	{
+		$builder = (new CaptchaBuilder())->build();
+		$phrase  = $builder->getPhrase();
+
+		ob_start();
+		$builder->output();
+		$image = ob_get_clean();
+
+		$base64 = 'data:image/png;base64,' . base64_encode($image);
+
+		$this->session->set('captcha', $phrase);
+
+		return $this->response->success($base64);
 	}
 
 	/**
@@ -47,7 +73,7 @@ final class IndexController extends AbstractHttpController
 	public function login(): ResponseInterface
 	{
 		$inputs   = $this->validator->login();
-		$userinfo = $this->serviceAdminAdministrator->login(... $inputs);
+		$userinfo = $this->permissionService->login(... $inputs);
 		$userid   = $userinfo->id;
 		$token    = $this->security->create($userid);
 
@@ -62,8 +88,6 @@ final class IndexController extends AbstractHttpController
 	}
 
 	/**
-	 * Get the userinfo.
-	 *
 	 * @return ResponseInterface
 	 *
 	 * @api {get} /admin/index/userinfo
@@ -79,6 +103,26 @@ final class IndexController extends AbstractHttpController
 		$userinfo = Context::get('userinfo');
 
 		return $this->response->success($userinfo);
+	}
+
+	/**
+	 * @return ResponseInterface
+	 *
+	 * @api {get} /admin/index/routes
+	 */
+	#[
+		RequestMapping(path: 'routes', methods: 'GET'),
+		Middlewares([
+			AuthenticationMiddleware::class,
+		]),
+	]
+	public function routes(): ResponseInterface
+	{
+		$userinfo = Context::get('userinfo');
+
+		return $this->response->success(
+			$this->permissionService->getMenuList($userinfo),
+		);
 	}
 
 	/**
@@ -99,34 +143,8 @@ final class IndexController extends AbstractHttpController
 		$token = $this->request->header('Authorization');
 
 		//  移除签发凭证
-		$this->serviceAdminAdministrator->logout($token);
+		$this->permissionService->logout($token);
 
 		return $this->response->success();
-	}
-
-	/**
-	 * Get a captcha.
-	 *
-	 * @return ResponseInterface
-	 *
-	 * @api {get} /admin/index/captcha
-	 */
-	#[
-		RequestMapping(path: 'captcha', methods: 'GET'),
-	]
-	public function captcha(): ResponseInterface
-	{
-		$builder = (new CaptchaBuilder())->build();
-		$phrase  = $builder->getPhrase();
-
-		$this->session->set('captcha', $phrase);
-
-		ob_start();
-		$builder->output();
-		$image = ob_get_clean();
-
-		$base64 = 'data:image/png;base64,' . base64_encode($image);
-
-		return $this->response->success($base64);
 	}
 }

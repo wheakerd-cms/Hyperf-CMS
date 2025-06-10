@@ -18,16 +18,10 @@ final readonly class MenuDao extends AbstractDao
 		parent::__construct($model);
 	}
 
-	public function getAllId(): array
-	{
-		return $this->newQuery->pluck('id')->toArray();
-	}
-
-	public function getSelectInId(array $routerIds): array
-	{
-		return $this->newQuery->find($routerIds)->toArray();
-	}
-
+	/**
+	 *
+	 * @return array<integer>
+	 */
 	public function getList(): array
 	{
 		$list = $this->newQuery->get()->map(function (MenuModel $model) {

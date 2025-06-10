@@ -6,26 +6,21 @@ namespace App\Service\Admin;
 use App\Abstract\AbstractService;
 use App\Cache\Admin\AdministratorCache;
 use App\Dao\Admin\AdministratorDao;
-use App\Dao\Admin\RoleDao;
 use App\Dao\Admin\MenuDao;
 use App\Exception\CustomMessageException;
 use App\Model\Admin\AdministratorModel;
-use App\Model\Admin\ModelAdminRoles;
-use App\Security\AdminSecurity;
-use App\Utils\Functions;
+use App\Model\Admin\RoleModel;
 use stdClass;
 
 /**
- * @AdministratorService
- * @\App\Service\Admin\AdministratorService
+ * @PermissionService
+ * @\App\Service\Admin\PermissionService
  */
-final class AdministratorService extends AbstractService
+final class PermissionService extends AbstractService
 {
 	public function __construct(
 		private readonly AdministratorCache $administratorCache,
-		private readonly AdminSecurity      $adminSecurity,
 		private readonly AdministratorDao   $daoAdminAdministrator,
-		private readonly RoleDao            $daoAdminRoles,
 		private readonly MenuDao            $daoAdminRouter,
 	)
 	{
@@ -66,16 +61,20 @@ final class AdministratorService extends AbstractService
 	public function logout(string $token): void
 	{
 		$this->administratorCache->delToken($token);
-
 	}
 
-	public function getMenuList(int $roleId): array
+	public function getMenuList(AdministratorModel $model): array
 	{
-		$routerIds = $roleId === 1
-			? $this->daoAdminRouter->getAllId()
-			: $this->daoAdminRoles->getRouters($roleId);
+		$routes = [];
 
-		$routes = $this->daoAdminRouter->getSelectInId($routerIds);
+		/* @var RoleModel $role */
+		foreach ($model->roles as $role) {
+			if ($role->isSystem) {
+				$routes = $this->daoAdminRouter->getList();
+				break;
+			}
+			$routes = $role->routes();
+		}
 
 		$getMenuList = function (array &$list, int $parentId = 0) use (&$getMenuList) {
 			$data = [];
@@ -105,28 +104,5 @@ final class AdministratorService extends AbstractService
 		};
 
 		return $getMenuList($routes);
-	}
-
-	/**
-	 * 获取该用户角色下的所有管理员
-	 *
-	 * @param int         $roleId
-	 * @param string|null $params
-	 *
-	 * @return array
-	 */
-	public function getAdministratorBelongToRole(int $roleId, ?string $params = null): array
-	{
-		$roleSelect = $this->daoAdminRoles->newQuery->select()->get()->toArray();
-
-		/* @var integer[] $roleGroup */
-		$roleGroup = Functions::extraColumn($roleSelect, 'id', 'parentId', 'id', $roleId);
-
-		return $this->table(
-			params: $params,
-			sorts : ['id' => 'desc'],
-			with  : ['roles'],
-			where : fn($query) => $query->whereIn('role_id', $roleGroup),
-		);
 	}
 }

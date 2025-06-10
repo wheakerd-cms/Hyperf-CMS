@@ -4,10 +4,8 @@ declare(strict_types=1);
 namespace App\Model\Admin;
 
 use App\Abstract\AbstractModel;
-use App\Model\Base\RoleMenuModel;
 use Carbon\Carbon;
 use Hyperf\Database\Model\Relations\BelongsToMany;
-use Hyperf\Database\Model\Relations\HasMany;
 
 /**
  * 管理员与角色的中间表
@@ -18,19 +16,21 @@ use Hyperf\Database\Model\Relations\HasMany;
  * @property integer $id         主键
  * @property integer $parentId   上级角色组ID
  * @property string  $name       角色名称
- * @property array   $routes     路由权限
+ * @property boolean $isSystem   系统管理员，true为系统管理员，false为非系统管理员
  * @property boolean $status     状态
  * @property Carbon  $createTime 创建时间
  * @property Carbon  $updateTime 更新时间
  */
 final class RoleModel extends AbstractModel
 {
-	protected ?string $table = 'base_role';
+	protected ?string $table = 'admin_role';
 
 	protected array $fillable = [
 		'id',
+		'parent_id',
 		'name',
-		'routes',
+		'is_system',
+		'status',
 		'create_time',
 		'update_time',
 	];
@@ -38,20 +38,18 @@ final class RoleModel extends AbstractModel
 	protected array $casts = [
 		'id'          => 'integer',
 		'name'        => 'string',
+		'is_system'   => 'boolean',
+		'status'      => 'boolean',
 		'create_time' => 'datetime:Y-m-d H:i:s',
 		'update_time' => 'datetime:Y-m-d H:i:s',
 	];
 
-	/**
-	 * @return HasMany
-	 */
-	public function roleMenu(): HasMany
-	{
-		return $this->hasMany(RoleMenuModel::class, 'role_id', 'id');
-	}
+	protected array $with = [
+		'routes',
+	];
 
 	public function routes(): BelongsToMany
 	{
-		return $this->belongsToMany(MenuModel::class, 'base_role_menu', 'role_id', 'menu_id');
+		return $this->belongsToMany(MenuModel::class, (new RoleMenuModel())->getTable(), 'role_id', 'menu_id');
 	}
 }
